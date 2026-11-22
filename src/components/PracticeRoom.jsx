@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import useMicrophone from '../hooks/useMicrophone.js';
 import { documentForPart, extractPart } from '../music/musicXml.js';
+import { getViolinFingering } from '../music/violinFingering.js';
 import { clearTiming, movePractice, observePractice, simulatePractice, startPractice } from '../practice/waitForNote.js';
 import { frequencyToNote } from '../utils/pitch.js';
 import DeveloperPanel from './DeveloperPanel.jsx';
+import FingerGuide from './FingerGuide.jsx';
 import Icon from './Icon.jsx';
 import ScoreView from './ScoreView.jsx';
 
@@ -30,6 +32,7 @@ export default function PracticeRoom({ exercise, partId, onPart, settings, onSet
     }
   }, [exercise, partId]);
   const events = sequence?.events ?? EMPTY_EVENTS;
+  const cues = useMemo(() => events.map(getViolinFingering), [events]);
   const [scoreStatus, setScoreStatus] = useState({ phase: 'loading', error: '' });
   const [state, setState] = useState(startPractice);
   const onObservation = useCallback((observation) => {
@@ -40,6 +43,7 @@ export default function PracticeRoom({ exercise, partId, onPart, settings, onSet
   const disabled = !sequence || scoreStatus.phase !== 'ready';
   const complete = Boolean(sequence) && state.index === events.length;
   const expected = events[state.index];
+  const currentCue = disabled ? null : cues[state.index];
   const noteCount = sequence?.noteCount ?? 0;
   const completedNotes = events.slice(0, state.index).filter(({ kind }) => kind === 'note').length;
   const detected = frequencyToNote(state.observation?.frequency);
@@ -141,10 +145,18 @@ export default function PracticeRoom({ exercise, partId, onPart, settings, onSet
               <strong>{reading?.label || '—'}</strong>
             </div>
           </div>
+          {currentCue && (
+            <a className="current-fingering" href="#finger-guide" data-violin-string={currentCue.string}
+              aria-label={`${currentCue.string} string · ${currentCue.label}. Go to finger guide.`}>
+              {currentCue.string} string · {currentCue.label}
+              <Icon name="down" size={12} />
+            </a>
+          )}
           <p className="note-tip">{disabled ? 'Load a playable part to get started.' : tipFor(expected, microphone.phase, state)}</p>
           {reading && <p className="frequency">{state.observation.frequency.toFixed(1)} Hz · {Math.round(reading.cents)} ¢ from {reading.label}</p>}
         </section>
       </div>
+      {!disabled && <FingerGuide events={events} cues={cues} index={state.index} />}
       <DeveloperPanel events={events} expected={expected} state={state} settings={settings}
         onSettings={changeSettings} disabled={disabled} microphonePhase={microphone.phase}
         onSimulate={(frequency) => setState((current) => simulatePractice(current, events, frequency, settings))} />

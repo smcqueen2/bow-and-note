@@ -34,6 +34,12 @@ Microphone access works on localhost and HTTPS. For an Android phone or tablet, 
 
 The score scrolls horizontally and keeps the highlighted note in view as you advance. Completed symbols fade. Progress counts pitched events, with each tie chain counted once. A final rest still needs to be completed after the note count reaches its total. **Next** and **Previous** move through one event, including rests. **Next** can also be used to skip a difficult note.
 
+### Finger guide
+
+Look under **Note check** for the current string and finger. Tap that cue to jump to the **Finger guide**, which shows where to place that finger and previews the next three events. It follows the score as you play, use the simulator, or step with **Next** and **Previous**. Zero means play the open string.
+
+The guide covers common first-position fingerings in standard G–D–A–E tuning. It favours open strings and uses MusicXML finger and string markings when they fit the pitch in that position. Rests, notes beyond the guide and incompatible markings have no position marker. Follow the worksheet or your teacher for other positions and fingerings. [Violin fingering chart](https://images.alfred.com/cms-assets/landingpages/free-remote-learning/pdf/00-34600.pdf)
+
 ## Test with a real violin
 
 1. Pick **Under arrest!**, open **Developer tools**, and press **Start microphone**. Allow access when the browser prompts. Check that the app says **Listening** and shows live signal level and clarity.

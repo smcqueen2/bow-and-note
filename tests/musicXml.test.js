@@ -92,6 +92,16 @@ test('merges a tie chain across measures and preserves written cursor positions'
   assert.equal(result.noteCount, 2);
 });
 
+test('retains the primary finger and string at a tied note’s attack', () => {
+  const markup = '<notations><technical><fingering>4</fingering><fingering alternate="yes">0</fingering><string>3</string></technical></notations>';
+  const substitute = '<notations><technical><fingering substitution="yes">0</fingering></technical></notations>';
+  const first = measure(divisions + note('A', 4, '', '<tie type="start"/>' + markup));
+  const second = measure(note('A', 4, '', '<tie type="stop"/>' + substitute), 2);
+  const { events } = sequence(file(first + second));
+  assert.equal(events.length, 1);
+  assert.deepEqual(events[0].fingering, { finger: 4, stringNumber: 3 });
+});
+
 test('reports malformed XML, unsupported chords and unmatched ties', () => {
   assert.throws(() => getScore('<score-partwise><part></score-partwise>'), /malformed XML/);
   assert.throws(() => getScore('<score-timewise/>'), /partwise/);

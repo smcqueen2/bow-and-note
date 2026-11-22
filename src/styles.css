@@ -329,8 +329,118 @@ h1, h2, h3, p { margin: 0; }
 .detected-reading { background: #f6f5fa; color: var(--muted); }
 .note-readings span { display: block; font-size: .82rem; font-weight: 630; }
 .note-readings strong { display: flex; align-items: center; min-height: 37px; margin-top: 2px; font-size: 1.65rem; letter-spacing: -.055em; line-height: 1.1; }
+.current-fingering {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 9px;
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: var(--string-wash);
+  color: var(--string-ink);
+  font-size: .85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.current-fingering svg { flex: none; }
+.current-fingering:hover { text-decoration: underline; }
 .note-tip { margin-top: 12px; color: var(--muted); font-size: .89rem; line-height: 1.45; }
 .frequency { margin-top: 5px; color: var(--muted); font-size: .81rem; font-variant-numeric: tabular-nums; }
+
+[data-violin-string="G"] { --string-line: #f5bd72; --string-wash: #fff2df; --string-ink: #794515; }
+[data-violin-string="D"] { --string-line: #8cdeb4; --string-wash: #e7f7ef; --string-ink: #235c49; }
+[data-violin-string="A"] { --string-line: #a6bdfc; --string-wash: #eef2ff; --string-ink: #344b90; }
+[data-violin-string="E"] { --string-line: #e1b4f7; --string-wash: #f6edfb; --string-ink: #623d88; }
+
+.finger-guide { margin-top: 18px; padding: 18px 24px 21px; scroll-margin-top: 12px; }
+.finger-guide-header { display: flex; align-items: center; gap: 9px; }
+.finger-guide-header h2 { font-size: 1.13rem; letter-spacing: -.026em; }
+.guide-position { margin-left: auto; color: var(--muted); font-size: .875rem; font-weight: 630; }
+.finger-guide-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 22px;
+  margin-top: 14px;
+}
+
+.finger-guide-current { min-width: 0; margin: 0; }
+.finger-guide-current figcaption { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 9px; }
+.finger-guide-current figcaption strong { font-size: 1rem; }
+.finger-guide-current figcaption span { color: var(--muted); font-size: .82rem; }
+.fingerboard {
+  padding: 7px 12px 8px 34px;
+  border: 1px solid #453652;
+  border-radius: 12px;
+  background: #271f37;
+  color: #f4effd;
+}
+
+.fingerboard-head { position: relative; height: 23px; font-size: .79rem; font-weight: 700; }
+.fingerboard-head > span { position: absolute; top: 2px; transform: translateX(-50%); }
+.fingerboard-lanes { position: relative; }
+.fingerboard-nut, .fingerboard-tape { position: absolute; top: 0; bottom: 0; }
+.fingerboard-nut { border-left: 2px solid #c1aecd; }
+.fingerboard-tape { border-left: 1px dashed #9f8cac; }
+.fingerboard-lane { position: relative; height: 26px; }
+.fingerboard-letter {
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  color: var(--string-line);
+  font-size: .8rem;
+  font-weight: 750;
+  transform: translateY(-50%);
+}
+
+.fingerboard-wire { position: absolute; top: 50%; inset-inline: 0; border-top: 1px solid var(--string-line); opacity: .84; }
+.fingering-marker {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--string-line);
+  border-radius: 50%;
+  background: var(--string-line);
+  color: #221a2e;
+  box-shadow: 0 0 0 2px #271f37;
+  font-size: .85rem;
+  transform: translate(-50%, -50%);
+}
+
+.guide-upcoming h3 { margin-bottom: 9px; font-size: 1rem; }
+.guide-upcoming ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-upcoming li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  min-height: 66px;
+  padding: 8px 9px;
+  border-left: 3px solid var(--string-line, #cbc1df);
+  border-radius: 8px;
+  background: var(--string-wash, #f4f1f7);
+  color: var(--string-ink, var(--muted));
+}
+
+.guide-upcoming li strong { font-size: .98rem; }
+.guide-upcoming li span { font-size: .83rem; line-height: 1.35; }
+.guide-help, .guide-end { color: var(--muted); font-size: .875rem; line-height: 1.45; }
+.guide-help { margin-top: 11px; }
 
 .developer { margin-top: 18px; }
 .developer summary {
@@ -405,8 +515,12 @@ h1, h2, h3, p { margin: 0; }
   .note-readings > div { padding: 6px; }
   .note-readings span { font-size: .72rem; }
   .note-readings strong { min-height: 27px; font-size: 1.25rem; }
+  .current-fingering { padding-inline: 6px; font-size: .75rem; }
   .note-tip { margin-top: 8px; font-size: .78rem; }
   .frequency { font-size: .75rem; }
+  .finger-guide { padding: 14px; }
+  .finger-guide-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .guide-upcoming li { padding-inline: 6px; }
   .developer-content { grid-template-columns: 1fr; }
 }
 

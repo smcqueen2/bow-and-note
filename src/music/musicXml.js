@@ -18,6 +18,7 @@ const REPEAT_TEXT = /^(?:d\.?\s*[cs]\.?\s*(?:al\s+(?:fine|coda))?|da capo(?:\s+a
  * @property {string} label Written pitch and octave, or Rest.
  * @property {number} [midi] Sounding MIDI number.
  * @property {number} [frequency] Target frequency in Hz.
+ * @property {{finger?: number, stringNumber?: number}} [fingering] Unambiguous technical markings at the attack.
  */
 
 const children = (element, name) => Array.from(element.children).filter((node) => node.localName === name);
@@ -110,6 +111,21 @@ function tieTypes(note) {
   };
 }
 
+function primaryTechnicalNumber(note, name, pattern) {
+  const values = new Set(descendants(note, name)
+    .filter((entry) => entry.parentNode.localName === 'technical'
+      && entry.getAttribute('alternate') !== 'yes' && entry.getAttribute('substitution') !== 'yes')
+    .map((entry) => entry.textContent.trim()));
+  const [number] = values;
+  return values.size === 1 && pattern.test(number) ? Number(number) : undefined;
+}
+
+function readFingering(note) {
+  const finger = primaryTechnicalNumber(note, 'fingering', /^[0-4]$/);
+  const stringNumber = primaryTechnicalNumber(note, 'string', /^[1-4]$/);
+  return finger !== undefined || stringNumber !== undefined ? { finger, stringNumber } : undefined;
+}
+
 /** Extract the written sequence for a single, non-transposing voice on one staff. */
 export function extractPart(document) {
   const part = child(document.documentElement, 'part');
@@ -182,7 +198,9 @@ export function extractPart(document) {
         openTie.visualCount += 1;
       } else {
         if (openTie) throw fail('A tie is missing its continuation.');
-        events.push({ ...position, ...pitch, kind: 'note' });
+        events.push({
+          ...position, ...pitch, kind: 'note', fingering: readFingering(entry),
+        });
       }
       openTie = starts ? events.at(-1) : null;
     });

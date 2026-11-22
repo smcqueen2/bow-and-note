@@ -13,6 +13,7 @@ const paths = {
   tools: <><path d="M4 7h16M4 17h16" /><rect x="8" y="4" width="3" height="6" rx="1" fill="currentColor" /><rect x="14" y="14" width="3" height="6" rx="1" fill="currentColor" /></>,
   down: <path d="m5 9 7 7 7-7" />,
   pulse: <path d="M2 12h4l3-7 5 14 3-7h5" />,
+  strings: <><path d="M4 6h16M4 12h16M4 18h16M9 4v16M16 4v16" /><circle cx="16" cy="12" r="2.6" fill="currentColor" /></>,
 };
 
 /** Draw a small interface icon. Interactive controls provide their own label. */
