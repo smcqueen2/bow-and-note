@@ -361,7 +361,7 @@ h1, h2, h3, p { margin: 0; }
 .guide-position { margin-left: auto; color: var(--muted); font-size: .875rem; font-weight: 630; }
 .finger-guide-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
   align-items: start;
   gap: 22px;
   margin-top: 14px;
@@ -372,34 +372,36 @@ h1, h2, h3, p { margin: 0; }
 .finger-guide-current figcaption strong { font-size: 1rem; }
 .finger-guide-current figcaption span { color: var(--muted); font-size: .82rem; }
 .fingerboard {
-  padding: 7px 12px 8px 34px;
+  max-width: 13.25rem;
+  padding: 9px 12px 10px 32px;
   border: 1px solid #453652;
   border-radius: 12px;
   background: #271f37;
   color: #f4effd;
 }
 
-.fingerboard-head { position: relative; height: 23px; font-size: .79rem; font-weight: 700; }
-.fingerboard-head > span { position: absolute; top: 2px; transform: translateX(-50%); }
-.fingerboard-lanes { position: relative; }
-.fingerboard-nut, .fingerboard-tape { position: absolute; top: 0; bottom: 0; }
-.fingerboard-nut { border-left: 2px solid #c1aecd; }
-.fingerboard-tape { border-left: 1px dashed #9f8cac; }
-.fingerboard-lane { position: relative; height: 26px; }
-.fingerboard-letter {
+.fingerboard-head, .fingerboard-lanes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.fingerboard-head { padding-bottom: 5px; text-align: center; }
+.fingerboard-letter { color: var(--string-line); font-size: .875rem; font-weight: 750; }
+.fingerboard-lanes { position: relative; height: 244px; }
+.fingerboard-positions {
   position: absolute;
-  top: 50%;
-  left: -24px;
-  color: var(--string-line);
+  inset-block: 0;
+  left: -22px;
+  width: 15px;
   font-size: .8rem;
-  font-weight: 750;
-  transform: translateY(-50%);
+  font-weight: 700;
 }
 
-.fingerboard-wire { position: absolute; top: 50%; inset-inline: 0; border-top: 1px solid var(--string-line); opacity: .84; }
+.fingerboard-positions > span { position: absolute; right: 0; transform: translateY(-50%); }
+.fingerboard-nut, .fingerboard-tape { position: absolute; inset-inline: 0; }
+.fingerboard-nut { border-top: 2px solid #c1aecd; }
+.fingerboard-tape { border-top: 1px dashed #9f8cac; }
+.fingerboard-lane { position: relative; }
+.fingerboard-wire { position: absolute; left: 50%; inset-block: 0; border-left: 1px solid var(--string-line); opacity: .84; }
 .fingering-marker {
   position: absolute;
-  top: 50%;
+  left: 50%;
   z-index: 1;
   display: grid;
   place-items: center;
@@ -414,6 +416,7 @@ h1, h2, h3, p { margin: 0; }
   transform: translate(-50%, -50%);
 }
 
+.guide-upcoming { max-width: 36rem; }
 .guide-upcoming h3 { margin-bottom: 9px; font-size: 1rem; }
 .guide-upcoming ol {
   display: grid;
@@ -519,7 +522,11 @@ h1, h2, h3, p { margin: 0; }
   .note-tip { margin-top: 8px; font-size: .78rem; }
   .frequency { font-size: .75rem; }
   .finger-guide { padding: 14px; }
-  .finger-guide-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .finger-guide-layout { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 12px; }
+  .fingerboard { padding-inline: 27px 7px; }
+  .fingerboard-lanes { height: 218px; }
+  .fingering-marker { width: 22px; height: 22px; }
+  .guide-upcoming ol { grid-template-columns: 1fr; }
   .guide-upcoming li { padding-inline: 6px; }
   .developer-content { grid-template-columns: 1fr; }
 }

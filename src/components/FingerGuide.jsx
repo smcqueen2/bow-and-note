@@ -5,7 +5,7 @@ import Icon from './Icon.jsx';
 const NUT = 17;
 const TAPE_MARKS = [[0, '0'], [2, '1'], [4, '2'], [5, '3'], [7, '4']];
 
-/** Estimate where a semitone falls along the playing length of a string. */
+/** Estimate a semitone's vertical position down the playing length of a string. */
 function positionFor(semitones) {
   if (semitones === 0) return '7%';
   const fraction = (1 - 2 ** (-semitones / 12)) / (1 - 2 ** (-7 / 12));
@@ -16,22 +16,26 @@ function Fingerboard({ cue, label }) {
   return (
     <div className="fingerboard" role="img" aria-label={`Violin fingerboard. ${label}`}>
       <div className="fingerboard-head" aria-hidden="true">
-        {TAPE_MARKS.map(([position, finger]) => (
-          <span key={finger} style={{ left: positionFor(position) }}>{finger}</span>
+        {VIOLIN_STRINGS.map(({ name }) => (
+          <span className="fingerboard-letter" data-violin-string={name} key={name}>{name}</span>
         ))}
       </div>
       <div className="fingerboard-lanes" aria-hidden="true">
-        <div className="fingerboard-nut" style={{ left: `${NUT}%` }} />
+        <div className="fingerboard-positions">
+          {TAPE_MARKS.map(([position, finger]) => (
+            <span key={finger} style={{ top: positionFor(position) }}>{finger}</span>
+          ))}
+        </div>
+        <div className="fingerboard-nut" style={{ top: `${NUT}%` }} />
         {TAPE_MARKS.slice(1).map(([position]) => (
-          <span key={position} className="fingerboard-tape" style={{ left: positionFor(position) }} />
+          <span key={position} className="fingerboard-tape" style={{ top: positionFor(position) }} />
         ))}
         {VIOLIN_STRINGS.map(({ name }) => {
           const active = cue?.string === name;
           return (
             <div className="fingerboard-lane" data-violin-string={name} key={name}>
-              <span className="fingerboard-letter">{name}</span>
               <span className="fingerboard-wire" />
-              {active && <strong className="fingering-marker" style={{ left: positionFor(cue.semitones) }}>{cue.finger}</strong>}
+              {active && <strong className="fingering-marker" style={{ top: positionFor(cue.semitones) }}>{cue.finger}</strong>}
             </div>
           );
         })}
