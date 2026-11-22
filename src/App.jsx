@@ -2,13 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from './components/Icon.jsx';
 import PracticeRoom from './components/PracticeRoom.jsx';
 import { readScore } from './music/musicXml.js';
+import { DEFAULT_SAMPLE, SAMPLES } from './music/samples.js';
 import { DEFAULT_SETTINGS } from './practice/waitForNote.js';
 
 const BASE = import.meta.env.BASE_URL;
-const SAMPLES = [
-  { id: '02_under_arrest.musicxml', label: 'Under arrest!' },
-  { id: '04_down_up.musicxml', label: 'Down up' },
-];
 
 /** Load bundled or local MusicXML, then open the selected exercise in the practice room. */
 export default function App() {
@@ -43,9 +40,14 @@ export default function App() {
   }, [open]);
 
   useEffect(() => {
-    openSample(SAMPLES[0]);
+    openSample(DEFAULT_SAMPLE);
     return () => { latestRequest.current += 1; };
   }, [openSample]);
+
+  function selectSample(event) {
+    const sample = SAMPLES.find(({ id }) => id === event.target.value);
+    if (sample) openSample(sample);
+  }
 
   function handleFile(event) {
     const file = event.target.files[0];
@@ -77,15 +79,17 @@ export default function App() {
           </div>
           <img src={`${BASE}violin.png`} alt="" className="hero-art" />
         </section>
-        <nav className="sample-picker" aria-label="Sample exercises">
-          <span>Sample exercises</span>
-          {SAMPLES.map((sample) => (
-            <button className="button sample-button" key={sample.id} type="button"
-              aria-pressed={exercise?.sampleId === sample.id} onClick={() => openSample(sample)}>
-              <Icon name="note" size={17} /> {sample.label}
-            </button>
-          ))}
-        </nav>
+        <label className="sample-picker" htmlFor="school-exercise">
+          <span>School exercises</span>
+          <span className="sample-select">
+            <Icon name="note" size={17} />
+            <select id="school-exercise" value={exercise?.sampleId ?? ''} onChange={selectSample}>
+              <option value="" disabled>Choose an exercise</option>
+              {SAMPLES.map(({ id, label }) => <option value={id} key={id}>{label}</option>)}
+            </select>
+            <Icon name="down" size={17} />
+          </span>
+        </label>
         {loadStatus.error && <p className="inline-message load-error" role="alert"><Icon name="info" />{loadStatus.error}</p>}
         {loadStatus.busy && <p className="inline-message load-error" role="status">Opening exercise…</p>}
         {exercise && (

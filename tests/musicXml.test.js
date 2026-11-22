@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import test from 'node:test';
 import { DOMParser } from '@xmldom/xmldom';
 import { documentForPart, extractPart, readScore } from '../src/music/musicXml.js';
+import { DEFAULT_SAMPLE, SAMPLES } from '../src/music/samples.js';
 
 const parse = (text) => new DOMParser({ onError: (_, message) => { throw new Error(message); } })
   .parseFromString(text, 'application/xml');
@@ -24,22 +25,39 @@ const file = (first, second) => `
 const getScore = (xml) => readScore(xml, 'Test score', parse);
 const sequence = (xml, part = 'P1') => extractPart(documentForPart(getScore(xml), part));
 
-const samples = [
-  ['02_under_arrest.musicxml', '2. Under arrest!', 27, 5, 'G3', true],
-  ['04_down_up.musicxml', '4. Down up', 31, 1, 'E5', false],
-];
+const samplesDirectory = new URL('../public/samples/', import.meta.url);
+const expectedSamples = {
+  '01_bow_down_o_belinda.musicxml': { parts: [[24, 0, 'G4'], [16, 0, 'G3']] },
+  '02_under_arrest.musicxml': { parts: [[27, 5, 'G3']], repeats: true },
+  '03_jim_along_josie.musicxml': { parts: [[20, 0, 'E5'], [16, 0, 'A4']], repeats: true },
+  '04_down_up.musicxml': { parts: [[31, 1, 'E5']] },
+  '05_two_in_a_boat.musicxml': { parts: [[36, 0, 'A4'], [16, 0, 'A4']] },
+  '06_london_bridge.musicxml': { parts: [[24, 0, 'A4'], [24, 0, 'D4']] },
+  '07_fast_lane.musicxml': { parts: [[37, 6, 'D4']], repeats: true },
+  '08_in_flight.musicxml': { parts: [[14, 2, 'E5']], repeats: true },
+};
 
-samples.forEach(([filename, title, notes, rests, firstPitch, repeats]) => {
-  test(`extracts the original ${filename} sample with its correct event counts`, async () => {
-    const text = await readFile(new URL(`../public/samples/${filename}`, import.meta.url), 'utf8');
+test('lists every bundled score once, in worksheet order, and opens Under arrest by default', async () => {
+  const filenames = (await readdir(samplesDirectory)).filter((filename) => filename.endsWith('.musicxml')).sort();
+  assert.deepEqual(SAMPLES.map(({ id }) => id), filenames);
+  assert.equal(DEFAULT_SAMPLE.id, '02_under_arrest.musicxml');
+});
+
+SAMPLES.forEach(({ id, label }) => {
+  test(`extracts all parts and written events from ${label}`, async () => {
+    const text = await readFile(new URL(id, samplesDirectory), 'utf8');
     const score = getScore(text);
-    const { events, noteCount, warnings } = extractPart(documentForPart(score, 'P1'));
-    assert.equal(score.title, title);
-    assert.equal(events[0].label, firstPitch);
-    assert.equal(noteCount, notes);
-    assert.equal(events.length, notes + rests);
-    assert.equal(events.at(-1).kind, 'rest');
-    assert.equal(warnings.some((warning) => warning.includes('one pass')), repeats);
+    const { parts, repeats = false } = expectedSamples[id];
+    assert.equal(score.title.replace(/^\d+\. /, ''), label);
+    assert.equal(score.parts.length, parts.length);
+    score.parts.forEach((part, index) => {
+      const { events, noteCount, warnings } = extractPart(documentForPart(score, part.id));
+      const [notes, rests, firstPitch] = parts[index];
+      assert.equal(events[0].label, firstPitch);
+      assert.equal(noteCount, notes);
+      assert.equal(events.length, notes + rests);
+      assert.equal(warnings.some((warning) => warning.includes('one pass')), repeats);
+    });
   });
 });
 

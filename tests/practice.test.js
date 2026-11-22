@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { DOMParser } from '@xmldom/xmldom';
 import { documentForPart, extractPart, readScore } from '../src/music/musicXml.js';
+import { SAMPLES } from '../src/music/samples.js';
 import {
   clearTiming, DEFAULT_SETTINGS, inspectObservation, movePractice, observePractice, simulatePractice, startPractice,
 } from '../src/practice/waitForNote.js';
@@ -97,16 +98,18 @@ test('pause stops progression and manual navigation remains usable', () => {
   assert.equal(movePractice(complete, events, -1).index, 2);
 });
 
-['02_under_arrest.musicxml', '04_down_up.musicxml'].forEach((filename) => {
-  test(`completes ${filename} through the shared simulator`, async () => {
-    const xml = await readFile(new URL(`../public/samples/${filename}`, import.meta.url), 'utf8');
-    const score = readScore(xml, 'Sample', (source) => new DOMParser().parseFromString(source, 'application/xml'));
-    const { events } = extractPart(documentForPart(score, 'P1'));
-    const result = events.reduce((state, event, index) => {
-      const next = simulatePractice(state, events, event.frequency ?? 0, DEFAULT_SETTINGS);
-      assert.equal(next.index, index + 1);
-      return next;
-    }, startPractice());
-    assert.equal(result.index, events.length);
+SAMPLES.forEach(({ id, label }) => {
+  test(`completes every part of ${label} through the shared simulator`, async () => {
+    const xml = await readFile(new URL(`../public/samples/${id}`, import.meta.url), 'utf8');
+    const score = readScore(xml, label, (source) => new DOMParser().parseFromString(source, 'application/xml'));
+    score.parts.forEach((part) => {
+      const { events } = extractPart(documentForPart(score, part.id));
+      const result = events.reduce((state, event, index) => {
+        const next = simulatePractice(state, events, event.frequency ?? 0, DEFAULT_SETTINGS);
+        assert.equal(next.index, index + 1, part.name);
+        return next;
+      }, startPractice());
+      assert.equal(result.index, events.length);
+    });
   });
 });

@@ -15,16 +15,22 @@ Open [http://localhost:5173/](http://localhost:5173/) or the URL printed by Vite
 
 Microphone access works on localhost and HTTPS. For an Android phone or tablet, use an HTTPS deployment. An HTTP URL pointing to a laptop’s LAN address can show the score and run the simulator, but browsers generally require a secure context for microphone capture. [MDN getUserMedia reference](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
 
-## Try both exercises without a violin
+## Try the school exercises without a violin
 
-1. Open the app. **Under arrest!** opens automatically. Select **Down up** to try the other sample. You can also choose **Import MusicXML** and select either original file or the copy in [public/samples](public/samples).
+1. Open the app. **Under arrest!** opens automatically. Use **School exercises** to pick any of the eight worksheets. For a duet, use **Part** to switch between melody and accompaniment. You can also choose **Import MusicXML** to open a file from your device.
 2. Leave the microphone off and open **Developer tools**. Press a different note to verify that the score stays put. Press the highlighted note once. A second press of the same button simulates a separate bow stroke.
 3. When **Play this** shows **Rest**, press **Quiet**. Continue until the completion message appears. Test **Pause**, **Resume**, **Previous**, **Next** and **Restart** along the way.
 
-| Exercise | Playable notes | Rests | Starts on |
-| --- | ---: | ---: | --- |
-| Under arrest! | 27 | 5 | G3 |
-| Down up | 31 | 1 | E5 |
+| Exercise | Melody or solo | Accompaniment |
+| --- | --- | --- |
+| Bow down, O Belinda | 24 notes | 16 notes |
+| Under arrest! | 27 notes, 5 rests | — |
+| Jim along Josie | 20 notes | 16 notes |
+| Down up | 31 notes, 1 rest | — |
+| Two in a boat | 36 notes | 16 notes |
+| London Bridge | 24 notes | 24 notes |
+| Fast lane | 37 notes, 6 rests | — |
+| In flight | 14 notes, 2 rests | — |
 
 The score scrolls horizontally and keeps the highlighted note in view as you advance. Completed symbols fade. Progress counts pitched events, with each tie chain counted once. A final rest still needs to be completed after the note count reaches its total. **Next** and **Previous** move through one event, including rests. **Next** can also be used to skip a difficult note.
 
@@ -33,7 +39,7 @@ The score scrolls horizontally and keeps the highlighted note in view as you adv
 1. Pick **Under arrest!**, open **Developer tools**, and press **Start microphone**. Allow access when the browser prompts. Check that the app says **Listening** and shows live signal level and clarity.
 2. Play the open strings individually with a steady bow. **Heard** should report G3 (196.00 Hz), D4 (293.66 Hz), A4 (440 Hz), and E5 (659.25 Hz), with some variation from tuning. Hold D4 first while the highlight still expects G3. The score should stay at the first note.
 3. Hold G3 steadily for roughly half a second. The score should advance once. Keep holding it to confirm the next G3 stays highlighted. Lift the bow for about a quarter to half a second, then play G3 again to advance.
-4. Play through to a rest. Let the sound die away for a moment. If the room keeps the level above the quiet threshold, tap **Next**. Try finishing both exercises, including the final rest.
+4. Play through to a rest. Let the sound die away for a moment. If the room keeps the level above the quiet threshold, tap **Next**. Try finishing **Under arrest!** or **Down up**, including the final rest.
 5. While listening, use **Pause** and play the expected note. The score should stay still while diagnostics continue. Resume, then press **Stop microphone** and confirm the browser releases its microphone indicator. Start again and switch exercise to check that the microphone is released on leaving the previous exercise.
 6. If testing on Android, check the landscape and portrait layouts and confirm the highlight remains inside the score as it moves.
 
@@ -61,9 +67,9 @@ npm run build
 npm run preview
 ```
 
-The tests cover pitch and cents conversion, Pitchy with synthetic tones, both MusicXML files, accidentals, parts, ties, support errors, repeated notes, timing, noise, rests, navigation and completion. Production output is in `dist/`. Vite reports a large-chunk advisory for the dynamically loaded OSMD renderer (about 381 kB gzip).
+The tests cover pitch and cents conversion, Pitchy with synthetic tones, event extraction and simulated completion of all 12 school exercise parts, accidentals, ties, support errors, repeated notes, timing, noise, rests and navigation. Production output is in `dist/`. Vite reports a large-chunk advisory for the dynamically loaded OSMD renderer (about 381 kB gzip).
 
-Local verification passed for lint, 18 automated tests, and the production build. A headless Edge smoke check served the build under a repository-style subpath, rendered both samples, completed both with the simulator at desktop and phone widths, and checked import validation, navigation and scrolling. A separate score exercised part selection, accidentals, ties and chord rejection. A synthetic Web Audio stream verified all four open-string pitches, wrong-note rejection, repeated-note rearming, and track release on stop and exercise change. The physical violin, device microphone permission prompts, and Android hardware remain to be checked using the steps above.
+**Under arrest!** and **Down up** completed in a microphone trial on a Pixel 9a. That trial verified all four open-string pitches, wrong-note rejection, repeated-note rearming and silence-based rests. The other school exercises have been checked with the simulator.
 
 ## MusicXML coverage and limitations
 
@@ -72,7 +78,7 @@ Local verification passed for lint, 18 automated tests, and the production build
 - Practice takes one pass in printed order, including when the score has repeat barlines or alternate endings. Markings for repeats and jumps remain visible where OSMD supports them. Chords, overlapping voices, transposing parts, grace notes and other unsupported notation show a message. Ornaments are practised at the written pitch.
 - Wait-for-note checks pitch and sequence. Written rhythms and tie durations remain visible. Rests use a fixed silence window, and the app gives no rhythm grade.
 - Continuous bow changes without a quiet break may need **Next**. Room noise, device audio processing, harmonics and widely varying intonation can interfere with pitch or silence detection. Pitchy’s clarity measures periodicity, so a steady pitched sound from elsewhere can also qualify.
-- Both files retain their original transcription-draft metadata. Compare them against the paper worksheets to confirm pitches, rhythms and bowing.
+- The school exercises in [public/samples](public/samples) retain their transcription-draft metadata. Compare them against the paper worksheets to confirm pitches, rhythms and bowing. **Fast lane** includes alternate endings and follows them in printed order.
 
 If the violin trial goes well, the next improvements are an onset detector for legato bow changes, a room-noise calibration step, and a small collection of real violin test cases evaluated on the devices used for lessons. Repeat expansion and an optional tempo mode can come after the wait-for-note interaction is reliable.
 
